@@ -187,12 +187,6 @@ http://127.0.0.1:5000/
 
 
 
-Screenshots
-
-All screenshots used in the report (dashboard, CRUD, procedures, functions, advanced queries) are available in the folder:
-
-/screenshots
-
 
 
 🧩 Future Enhancements
