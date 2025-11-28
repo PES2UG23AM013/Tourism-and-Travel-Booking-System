@@ -145,33 +145,6 @@ Total dependents per customer (aggregate)
 
 Confirmed bookings with hotel details (join)
 
-📁 Project Structure
-Tourism-and-Travel-Booking-System/
-│
-├── app.py
-├── requirements.txt
-├── tourism_and_travel_booking_system.sql
-│
-├── templates/
-│   ├── dashboard.html
-│   ├── customers.html
-│   ├── bookings.html
-│   ├── payments.html
-│   ├── packages.html
-│   ├── destinations.html
-│   ├── hotels.html
-│   ├── transports.html
-│   ├── procedures.html
-│   ├── functions.html
-│   ├── advanced_queries.html
-│   ├── login.html
-│   ├── register.html
-│   └── (other UI files)
-│
-└── static/
-    ├── styles.css
-
-
 
 ⚙️ How to Run the Project
 1️⃣ Install dependencies
