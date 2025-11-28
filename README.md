@@ -2,6 +2,7 @@
 
 A complete web-based travel management system built using Flask (Python) and MySQL, designed to manage customers, bookings, payments, tour packages, destinations, hotels, transport, and dependents for a travel agency.
 
+
 📌Project Overview
 
 The Tourism and Travel Booking System is a full-stack database-driven application designed to streamline travel agency operations.
@@ -25,7 +26,9 @@ Dashboard analytics & advanced SQL queries
 
 The project focuses on database design, relational mapping, and SQL automation through triggers and procedures.
 
+
 ⭐Features
+
 🧑‍💼 Customer Management
 
 Add/update/delete customers
@@ -33,6 +36,7 @@ Add/update/delete customers
 Multi-valued phone numbers
 
 Travel dependents (weak entity)
+
 
 🧾 Booking & Payment
 
@@ -42,17 +46,20 @@ Add payments
 
 Auto-update booking status to Paid using a trigger
 
+
 🧳 Package Management
 
 Create/manage tour packages
 
 Link with hotels, destinations, transport via M:N relationships
 
+
 🏨 Hotel, Destination, Transport
 
 Maintain resource details
 
 Integrated with packages and itineraries
+
 
 🧩 Advanced SQL
 
@@ -70,6 +77,7 @@ Aggregates
 
 Joins
 
+
 📊 Dashboard
 
 Total customers
@@ -79,6 +87,7 @@ Total bookings
 Total payments
 
 Navigation to all modules
+
 
 🛠️ Tech Stack
 Backend
@@ -110,6 +119,7 @@ GitHub
 phpMyAdmin
 
 
+
 🗄️ Database Features (Core DBMS Components)
 ✔ Triggers
 
@@ -117,17 +127,20 @@ trg_before_insert_dependent → Validates dependent age
 
 trg_after_payment_insert → Auto-updates booking status
 
+
 ✔ Stored Procedures
 
 calculate_package_total_cost
 
 get_bookings_by_customer
 
+
 ✔ Functions
 
 TotalAmountSpent
 
 fn_count_dependents
+
 
 ✔ Views
 
@@ -146,7 +159,9 @@ Total dependents per customer (aggregate)
 Confirmed bookings with hotel details (join)
 
 
+
 ⚙️ How to Run the Project
+
 1️⃣ Install dependencies
 pip install -r requirements.txt
 
@@ -158,16 +173,18 @@ Create database:
 
 Tourism_and_Travel_Booking_System
 
-
 Import:
 
 tourism_and_travel_booking_system.sql
 
+
 3️⃣ Start Flask server
 python app.py
 
+
 4️⃣ Open in browser
 http://127.0.0.1:5000/
+
 
 
 Screenshots
@@ -175,6 +192,8 @@ Screenshots
 All screenshots used in the report (dashboard, CRUD, procedures, functions, advanced queries) are available in the folder:
 
 /screenshots
+
+
 
 🧩 Future Enhancements
 
