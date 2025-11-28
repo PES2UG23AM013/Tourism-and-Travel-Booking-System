@@ -1,1 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procedures & Functions - Tourism & Travel Booking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary py-1 align-items-center">
+        <div class="container d-flex align-items-center">
+            <a class="navbar-brand" href="#"><i class="fas fa-globe-americas"></i> Voyago</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto flex-nowrap">
+                    {% if session.get('username') %}
+                        <li class="nav-item">
+                            <span class="navbar-text me-3">Welcome, admin</span>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('register') }}"><i class="fas fa-user-plus me-1"></i> Register</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('index') }}"><i class="fas fa-tachometer-alt me-1"></i> Dashboard</a>
+                    </li>
+                    {% if session.get('username') %}
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('customers') }}"><i class="fas fa-users me-1"></i> Customers</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('bookings') }}"><i class="fas fa-calendar-check me-1"></i> Bookings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('packages') }}"><i class="fas fa-suitcase me-1"></i> Packages</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('payments') }}"><i class="fas fa-credit-card me-1"></i> Payments</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('destinations') }}"><i class="fas fa-map-marker-alt me-1"></i> Destinations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('hotels') }}"><i class="fas fa-hotel me-1"></i> Hotels</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('transports') }}"><i class="fas fa-bus me-1"></i> Transports</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active d-flex align-items-center" href="{{ url_for('procedures') }}"><i class="fas fa-cogs me-1"></i> Procedures</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'warning' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5><i class="fas fa-play"></i> Stored Procedure: calculate_package_total_cost</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('run_procedure') }}">
+                            <div class="mb-3">
+                                <label for="package_id" class="form-label">Enter Package ID</label>
+                                <input type="number" class="form-control" id="package_id" name="package_id" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-play"></i> Run Procedure</button>
+                        </form>
+                        {% if procedure_results %}
+                            <div class="mt-3">
+                                <h6>Results for Package ID {{ package_id }}:</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Package Name</th>
+                                                <th>Package Price</th>
+                                                <th>Sample Hotel Price</th>
+                                                <th>Sample Transport Price</th>
+                                                <th>Estimated Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for result in procedure_results %}
+                                                <tr>
+                                                    <td>{{ result[0] }}</td>
+                                                    <td>₹{{ "%.2f"|format(result[1]) if result[1] else '0.00' }}</td>
+                                                    <td>₹{{ "%.2f"|format(result[2]) if result[2] else '0.00' }}</td>
+                                                    <td>₹{{ "%.2f"|format(result[3]) if result[3] else '0.00' }}</td>
+                                                    <td>₹{{ "%.2f"|format(result[4]) if result[4] else '0.00' }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="fas fa-calculator"></i> Function: Total Amount Spent</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('run_function') }}">
+                            <div class="mb-3">
+                                <label for="func_customer_id" class="form-label">Enter Customer ID</label>
+                                <input type="number" class="form-control" id="func_customer_id" name="customer_id" required>
+                            </div>
+                            <button type="submit" class="btn btn-success"><i class="fas fa-calculator"></i> Run Function</button>
+                        </form>
+                        {% if function_result %}
+                            <div class="mt-3 alert alert-info">
+                                <strong>Result:</strong> {{ function_result }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5><i class="fas fa-info-circle"></i> About Procedures & Functions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Stored Procedure: calculate_package_total_cost</h6>
+                                <p>This procedure calculates the total cost of a package for a given package ID, including package price, hotel price, and transport price.</p>
+                                <ul>
+                                    <li><strong>Input:</strong> Package ID</li>
+                                    <li><strong>Output:</strong> Package details with estimated total cost</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>User-Defined Function: TotalAmountSpent</h6>
+                                <p>This function calculates the total amount spent by a customer across all their payments.</p>
+                                <ul>
+                                    <li><strong>Input:</strong> Customer ID</li>
+                                    <li><strong>Output:</strong> Total spent amount in rupees</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
