@@ -1,1 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers - Tourism & Travel Booking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary py-1 align-items-center">
+        <div class="container d-flex align-items-center">
+            <a class="navbar-brand" href="#"><i class="fas fa-globe-americas"></i> Voyago</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto flex-nowrap">
+                    {% if session.get('username') %}
+                        <li class="nav-item">
+                            <span class="navbar-text me-3">Welcome, admin</span>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('register') }}"><i class="fas fa-user-plus me-1"></i> Register</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('index') }}"><i class="fas fa-tachometer-alt me-1"></i> Dashboard</a>
+                    </li>
+                    {% if session.get('username') %}
+                        <li class="nav-item">
+                            <a class="nav-link active d-flex align-items-center" href="{{ url_for('customers') }}"><i class="fas fa-users me-1"></i> Customers</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('bookings') }}"><i class="fas fa-calendar-check me-1"></i> Bookings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('packages') }}"><i class="fas fa-suitcase me-1"></i> Packages</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('payments') }}"><i class="fas fa-credit-card me-1"></i> Payments</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('destinations') }}"><i class="fas fa-map-marker-alt me-1"></i> Destinations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('hotels') }}"><i class="fas fa-hotel me-1"></i> Hotels</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('transports') }}"><i class="fas fa-bus me-1"></i> Transports</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'warning' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5><i class="fas fa-plus"></i> Add New Customer</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('add_customer') }}">
+                            <div class="mb-3">
+                                <label for="customer_id" class="form-label">Customer ID</label>
+                                <input type="number" class="form-control" id="customer_id" name="customer_id" value="{{ next_customer_id }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="city" class="form-label">City</label>
+                                        <input type="text" class="form-control" id="city" name="city" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="state" class="form-label">State</label>
+                                        <input type="text" class="form-control" id="state" name="state" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="country" class="form-label">Country</label>
+                                <input type="text" class="form-control" id="country" name="country" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="refers" class="form-label">Refers</label>
+                                <input type="number" class="form-control" id="refers" name="refers" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Add Customer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="fas fa-user-plus"></i> Add Travel Dependent</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('add_dependent') }}">
+                            <div class="mb-3">
+                                <label for="dependent_name" class="form-label">Dependent Name</label>
+                                <input type="text" class="form-control" id="dependent_name" name="dependent_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="age" class="form-label">Age</label>
+                                <input type="number" class="form-control" id="age" name="age" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="relation" class="form-label">Relation</label>
+                                <input type="text" class="form-control" id="relation" name="relation" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="customer_id_dep" class="form-label">Customer ID</label>
+                                <input type="number" class="form-control" id="customer_id_dep" name="customer_id" required>
+                            </div>
+                            <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Add Dependent</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list"></i> All Customers</h5>
+                        <a href="{{ url_for('view_customers') }}" class="btn btn-light btn-sm"><i class="fas fa-sync"></i> Refresh</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>State</th>
+                                        <th>City</th>
+                                        <th>Country</th>
+                                        <th>Refers</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if customers %}
+                                        {% for customer in customers %}
+                                            <tr>
+                                                <td>{{ customer[0] }}</td>
+                                                <td>{{ customer[1] }}</td>
+                                                <td>{{ customer[2] }}</td>
+                                                <td>{{ customer[3] }}</td>
+                                                <td>{{ customer[4] }}</td>
+                                                <td>{{ customer[5] }}</td>
+                                                <td>{{ customer[6] }}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-warning" data-id="{{ customer[0] }}" data-name="{{ customer[1] }}" data-email="{{ customer[2] }}" data-state="{{ customer[3] }}" data-city="{{ customer[4] }}" data-country="{{ customer[5] }}" data-refers="{{ customer[6] }}" onclick="editCustomer(this)"><i class="fas fa-edit"></i> Edit</button>
+                                                    <form method="POST" action="{{ url_for('delete_customer') }}" style="display:inline;">
+                                                        <input type="hidden" name="customer_id" value="{{ customer[0] }}">
+                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this customer?')"><i class="fas fa-trash"></i> Delete</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="8" class="text-muted">No customers found.</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-users"></i> All Travel Dependents</h5>
+                        <a href="{{ url_for('view_dependents') }}" class="btn btn-light btn-sm"><i class="fas fa-sync"></i> Refresh</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Age</th>
+                                        <th>Relation</th>
+                                        <th>Customer ID</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if dependents %}
+                                        {% for dependent in dependents %}
+                                            <tr>
+                                                <td>{{ dependent[1] }}</td>
+                                                <td>{{ dependent[2] }}</td>
+                                                <td>{{ dependent[3] }}</td>
+                                                <td>{{ dependent[4] }}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-warning" data-id="{{ dependent[0] }}" data-name="{{ dependent[1] }}" data-age="{{ dependent[2] }}" data-relation="{{ dependent[3] }}" data-customer_id="{{ dependent[4] }}" onclick="editDependent(this)"><i class="fas fa-edit"></i> Edit</button>
+                                                    <form method="POST" action="{{ url_for('delete_dependent') }}" style="display:inline;">
+                                                        <input type="hidden" name="dependent_id" value="{{ dependent[0] }}">
+                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this dependent?')"><i class="fas fa-trash"></i> Delete</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-muted">No dependents found.</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const addCustomerUrl = "{{ url_for('add_customer') }}";
+        const updateCustomerUrl = "{{ url_for('update_customer') }}";
+        const addDependentUrl = "{{ url_for('add_dependent') }}";
+        const updateDependentUrl = "{{ url_for('update_dependent') }}";
+
+        function editCustomer(button) {
+            const id = button.getAttribute('data-id');
+            const name = button.getAttribute('data-name');
+            const email = button.getAttribute('data-email');
+            const state = button.getAttribute('data-state');
+            const city = button.getAttribute('data-city');
+            const country = button.getAttribute('data-country');
+            const refers = button.getAttribute('data-refers');
+            document.getElementById('customer_id').value = id;
+            document.getElementById('name').value = name;
+            document.getElementById('email').value = email;
+            document.getElementById('state').value = state;
+            document.getElementById('city').value = city;
+            document.getElementById('country').value = country;
+            document.getElementById('refers').value = refers;
+            // Change the form action to update
+            const form = document.querySelector('form[action="' + addCustomerUrl + '"]');
+            form.action = updateCustomerUrl;
+            form.querySelector('button[type="submit"]').innerHTML = "<i class=\"fas fa-save\"></i> Update Customer";
+        }
+
+        function editDependent(button) {
+            const name = button.getAttribute('data-name');
+            const age = button.getAttribute('data-age');
+            const relation = button.getAttribute('data-relation');
+            const customer_id = button.getAttribute('data-customer_id');
+            document.getElementById('dependent_name').value = name;
+            document.getElementById('age').value = age;
+            document.getElementById('relation').value = relation;
+            document.getElementById('customer_id_dep').value = customer_id;
+            // Change the form action to update
+            const form = document.querySelector('form[action="' + addDependentUrl + '"]');
+            form.action = updateDependentUrl;
+            form.querySelector('button[type="submit"]').innerHTML = "<i class=\"fas fa-save\"></i> Update Dependent";
+        }
+    </script>
+</body>
+</html>
 
