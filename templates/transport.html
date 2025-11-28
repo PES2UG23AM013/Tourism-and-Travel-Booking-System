@@ -1,1 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transports - Tourism & Travel Booking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary py-1 align-items-center">
+        <div class="container d-flex align-items-center">
+            <a class="navbar-brand" href="#"><i class="fas fa-globe-americas"></i> Voyago</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto flex-nowrap">
+                    {% if session.get('username') %}
+                        <li class="nav-item">
+                            <span class="navbar-text me-3">Welcome, admin</span>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('register') }}"><i class="fas fa-user-plus me-1"></i> Register</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('index') }}"><i class="fas fa-tachometer-alt me-1"></i> Dashboard</a>
+                    </li>
+                    {% if session.get('username') %}
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('customers') }}"><i class="fas fa-users me-1"></i> Customers</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('bookings') }}"><i class="fas fa-calendar-check me-1"></i> Bookings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('packages') }}"><i class="fas fa-suitcase me-1"></i> Packages</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('payments') }}"><i class="fas fa-credit-card me-1"></i> Payments</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('destinations') }}"><i class="fas fa-map-marker-alt me-1"></i> Destinations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('hotels') }}"><i class="fas fa-hotel me-1"></i> Hotels</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active d-flex align-items-center" href="{{ url_for('transports') }}"><i class="fas fa-bus me-1"></i> Transports</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'warning' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5><i class="fas fa-plus"></i> Add New Transport</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('add_transport') }}">
+                            <div class="mb-3">
+                                <label for="transport_id" class="form-label">Transport ID</label>
+                                <input type="number" class="form-control" id="transport_id" name="transport_id" value="{{ next_transport_id }}" readonly required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="transport_type" class="form-label">Transport Type</label>
+                                <input type="text" class="form-control" id="transport_type" name="transport_type" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="depart_location" class="form-label">Depart Location</label>
+                                <input type="text" class="form-control" id="depart_location" name="depart_location" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="arrival_location" class="form-label">Arrival Location</label>
+                                <input type="text" class="form-control" id="arrival_location" name="arrival_location" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="depart_datetime" class="form-label">Depart DateTime</label>
+                                <input type="datetime-local" class="form-control" id="depart_datetime" name="depart_datetime" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="arrival_datetime" class="form-label">Arrival DateTime</label>
+                                <input type="datetime-local" class="form-control" id="arrival_datetime" name="arrival_datetime" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="transport_price" class="form-label">Transport Price</label>
+                                <input type="number" step="0.01" class="form-control" id="transport_price" name="transport_price" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Add Transport</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list"></i> All Transports</h5>
+                        <a href="{{ url_for('view_transports') }}" class="btn btn-light btn-sm"><i class="fas fa-sync"></i> Refresh</a>
+                    </div>
+                    <div class="card-body">
+                        {% if transports %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Transport ID</th>
+                                            <th>Type</th>
+                                            <th>Depart Location</th>
+                                            <th>Arrival Location</th>
+                                            <th>Depart DateTime</th>
+                                            <th>Arrival DateTime</th>
+                                            <th>Price</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for transport in transports %}
+                                            <tr>
+                                                <td>{{ transport[0] }}</td>
+                                                <td>{{ transport[1] }}</td>
+                                                <td>{{ transport[2] }}</td>
+                                                <td>{{ transport[3] }}</td>
+                                                <td>{{ transport[4] }}</td>
+                                                <td>{{ transport[5] }}</td>
+                                                <td>{{ transport[6] }}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#editModal" data-id="{{ transport[0] }}" data-type="{{ transport[1] }}" data-depart="{{ transport[2] }}" data-arrival="{{ transport[3] }}" data-departdt="{{ transport[4] }}" data-arrivaldt="{{ transport[5] }}" data-price="{{ transport[6] }}" onclick="editTransport(this)"><i class="fas fa-edit"></i> Edit</button>
+                                                    <form method="POST" action="{{ url_for('delete_transport') }}" style="display:inline;">
+                                                        <input type="hidden" name="transport_id" value="{{ transport[0] }}">
+                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this transport?')"><i class="fas fa-trash"></i> Delete</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No transports found. <a href="{{ url_for('view_transports') }}">Click to load transports</a>.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Transport Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Transport</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ url_for('update_transport') }}">
+                    <div class="modal-body">
+                        <input type="hidden" id="edit_transport_id" name="transport_id">
+                        <div class="mb-3">
+                            <label for="edit_transport_type" class="form-label">Transport Type</label>
+                            <input type="text" class="form-control" id="edit_transport_type" name="transport_type" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_depart_location" class="form-label">Depart Location</label>
+                            <input type="text" class="form-control" id="edit_depart_location" name="depart_location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_arrival_location" class="form-label">Arrival Location</label>
+                            <input type="text" class="form-control" id="edit_arrival_location" name="arrival_location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_depart_datetime" class="form-label">Depart DateTime</label>
+                            <input type="datetime-local" class="form-control" id="edit_depart_datetime" name="depart_datetime" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_arrival_datetime" class="form-label">Arrival DateTime</label>
+                            <input type="datetime-local" class="form-control" id="edit_arrival_datetime" name="arrival_datetime" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_transport_price" class="form-label">Transport Price</label>
+                            <input type="number" step="0.01" class="form-control" id="edit_transport_price" name="transport_price" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Transport</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function editTransport(button) {
+            const id = button.getAttribute('data-id');
+            const type = button.getAttribute('data-type');
+            const depart = button.getAttribute('data-depart');
+            const arrival = button.getAttribute('data-arrival');
+            const departdt = button.getAttribute('data-departdt');
+            const arrivaldt = button.getAttribute('data-arrivaldt');
+            const price = button.getAttribute('data-price');
+            document.getElementById('edit_transport_id').value = id;
+            document.getElementById('edit_transport_type').value = type;
+            document.getElementById('edit_depart_location').value = depart;
+            document.getElementById('edit_arrival_location').value = arrival;
+            document.getElementById('edit_depart_datetime').value = departdt;
+            document.getElementById('edit_arrival_datetime').value = arrivaldt;
+            document.getElementById('edit_transport_price').value = price;
+        }
+    </script>
+</body>
+</html>
 
